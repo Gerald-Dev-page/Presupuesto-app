@@ -2,6 +2,10 @@ import { useState } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
+// Importamos los activos para que Vite los procese correctamente en producción
+import logoPdf from '../assets/logo.png';
+import marcaAguaPdf from '../assets/marca-de-agua.png';
+
 // ==========================================
 // MOTOR DE TRADUCCIÓN: NÚMEROS A LETRAS
 // ==========================================
@@ -93,7 +97,7 @@ const numeroALetras = (numero) => {
     const cientos = Math.floor(num / divisor);
     const resto = num - (cientos * divisor);
     let strMiles = Seccion(num, divisor, 'UN MIL', 'MIL');
-    if (strMiles === 'UN MIL') strMiles = 'MIL'; // Corrección gramatical
+    if (strMiles === 'UN MIL') strMiles = 'MIL'; 
     const strCentenas = Centenas(resto);
     if(strMiles === '') return strCentenas;
     return strMiles + (strCentenas ? ' ' + strCentenas : '');
@@ -112,7 +116,6 @@ const numeroALetras = (numero) => {
   if (numero === 0) return 'CERO';
   
   const enteros = Math.floor(numero);
-  // Calculamos los centavos si los hubiera
   const centavos = Math.round((numero - enteros) * 100);
   
   const letrasEnteros = Millones(enteros).trim();
@@ -120,8 +123,10 @@ const numeroALetras = (numero) => {
 
   return `SON PESOS: ${letrasEnteros}${letrasCentavos}.-`;
 };
-// ==========================================
 
+// ==========================================
+// COMPONENTE PRINCIPAL
+// ==========================================
 export default function VistaPrevia({ cliente, items, totalNeto, iva, totalFinal, numeroPresupuesto, onVolver }) {
   const [generando, setGenerando] = useState(false);
 
@@ -139,6 +144,7 @@ export default function VistaPrevia({ cliente, items, totalNeto, iva, totalFinal
 
   const handleExportarPDF = async () => {
     setGenerando(true);
+    
     const cargarImagen = (url) => {
       return new Promise((resolve, reject) => {
         const img = new Image();
@@ -156,11 +162,13 @@ export default function VistaPrevia({ cliente, items, totalNeto, iva, totalFinal
       
       let logoImg = null;
       let marcaAguaImg = null;
+      
       try {
-        logoImg = await cargarImagen('/logo.png');
-        marcaAguaImg = await cargarImagen('/marca-de-agua.png');
+        // Usamos las variables importadas para asegurar compatibilidad con el build de producción
+        logoImg = await cargarImagen(logoPdf);
+        marcaAguaImg = await cargarImagen(marcaAguaPdf);
       } catch (e) {
-        console.warn("Faltan imágenes en /public", e);
+        console.warn("Error cargando imágenes desde assets", e);
       }
 
       // --- CABECERA IZQUIERDA ---
@@ -209,6 +217,7 @@ export default function VistaPrevia({ cliente, items, totalNeto, iva, totalFinal
       doc.text(cliente?.empresa || 'Consumidor Final', 130, 73);
 
       // --- MARCA DE AGUA (Fondo) ---
+      // Se posiciona al medio para que no interfiera con el footer final
       if (marcaAguaImg) {
         doc.addImage(marcaAguaImg, 'PNG', 50, 110, 110, 110);
       }
@@ -257,12 +266,8 @@ export default function VistaPrevia({ cliente, items, totalNeto, iva, totalFinal
       doc.text("TOTAL FINAL", 132, finalY + 18.5);
       doc.text(formatearMoneda(totalFinal), 194, finalY + 18.5, { align: "right" });
 
-      // ========================================================
-      // CÁLCULO DINÁMICO DE ESPACIO PARA EL FOOTER
-      // La marca de agua empieza en Y=110 y mide 110 (termina en 220).
-      // Math.max garantiza que si la tabla es corta, el texto SON PESOS
-      // empiece SIEMPRE después del píxel 230, asegurando que no se pisen.
-      // ========================================================
+      // --- CÁLCULO DE POSICIÓN DEL FOOTER ---
+      // Aseguramos que el texto "SON PESOS" siempre aparezca después de la marca de agua (Y=220 aprox)
       const bottomY = Math.max(finalY + 40, 230); 
 
       // Caja gris de "SON PESOS"
@@ -273,10 +278,8 @@ export default function VistaPrevia({ cliente, items, totalNeto, iva, totalFinal
       doc.setFontSize(9);
       doc.setFont("helvetica", "bold");
       
-      // Llamamos a nuestra función traductora
+      // Conversión del monto a texto
       const textoLetras = numeroALetras(totalFinal);
-      
-      // Ajustamos el texto dentro de la caja gris centrado verticalmente
       doc.text(textoLetras, 18, bottomY + 8.5);
 
       // Bloque de Condiciones
@@ -329,7 +332,8 @@ export default function VistaPrevia({ cliente, items, totalNeto, iva, totalFinal
       </div>
 
       <div className="bg-blanco p-10 rounded-xl shadow-sm border border-gray-100 text-center">
-        <img src="/logo.png" alt="Logo" className="h-24 mx-auto mb-6 object-contain" />
+        {/* Usamos la variable importada para la vista previa en pantalla */}
+        <img src={logoPdf} alt="Logo" className="h-24 mx-auto mb-6 object-contain" />
         
         <h2 className="text-3xl font-titulo font-black text-negro mb-2 tracking-wide">
           COTIZACIÓN <span className="text-rojo">{numeroPresupuesto}</span>

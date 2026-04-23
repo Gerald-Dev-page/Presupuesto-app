@@ -1,5 +1,5 @@
 import { FileText, Package, Users, Settings } from 'lucide-react';
-
+import logoGerald from '../assets/logoGerald.png';
 export default function Sidebar({ vistaActual, setVistaActual }) {
   const menuItems = [
     { id: 'presupuestos', label: 'Cotizaciones', Icon: FileText },
@@ -94,7 +94,7 @@ export default function Sidebar({ vistaActual, setVistaActual }) {
           Desarrollado por
         </span>
         <img 
-          src="/logoGerald.png" 
+          src={logoGerald}
           alt="Gerald Dev" 
           className="h-auto max-w-[90px] object-contain opacity-70 hover:opacity-100 transition-opacity duration-200"
         />
