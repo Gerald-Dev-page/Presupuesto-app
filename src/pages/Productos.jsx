@@ -10,8 +10,9 @@ export default function Productos() {
   // Estado para la notificación no bloqueante (Toast)
   const [toast, setToast] = useState({ visible: false, mensaje: '', tipo: 'exito' });
   
+  // Se eliminó 'codigo' del estado inicial
   const [formData, setFormData] = useState({
-    codigo: '', nombre: '', precio_unidad: '', unidad: 'm3'
+    nombre: '', precio_unidad: '', unidad: 'm3'
   });
 
   const mostrarNotificacion = (mensaje, tipo = 'exito') => {
@@ -30,9 +31,10 @@ export default function Productos() {
         precio_unidad: Number(formData.precio_unidad)
       });
       setProductos([...productos, res]);
-      setFormData({ codigo: '', nombre: '', precio_unidad: '', unidad: 'm3' });
       
-      // Reemplazamos el alert() por el Toast elegante
+      // Se eliminó 'codigo' del reseteo
+      setFormData({ nombre: '', precio_unidad: '', unidad: 'm3' });
+      
       mostrarNotificacion("Tarifa registrada correctamente en el catálogo.");
     } catch (err) {
       mostrarNotificacion("Error de conexión: " + err.message, "error");
@@ -66,16 +68,9 @@ export default function Productos() {
           NUEVO MATERIAL O SERVICIO
         </h3>
         
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-5 gap-5 font-texto">
-          <div className="md:col-span-1">
-            <label className="block text-xs font-bold text-gris-claro uppercase tracking-wider mb-2">Código SKU</label>
-            <input 
-              type="text" placeholder="Ej: SUELO-01" 
-              value={formData.codigo} 
-              onChange={e => setFormData({...formData, codigo: e.target.value})} 
-              className="w-full p-3 bg-fondo border border-gray-200 rounded-lg focus:ring-2 focus:ring-rojo outline-none transition-all text-negro" 
-            />
-          </div>
+        {/* Grilla ajustada a 4 columnas tras eliminar el código */}
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-4 gap-5 font-texto">
+          
           <div className="md:col-span-2">
             <label className="block text-xs font-bold text-gris-claro uppercase tracking-wider mb-2">Descripción</label>
             <input 
@@ -85,6 +80,7 @@ export default function Productos() {
               className="w-full p-3 bg-fondo border border-gray-200 rounded-lg focus:ring-2 focus:ring-rojo outline-none transition-all text-negro" 
             />
           </div>
+
           <div className="md:col-span-1">
             <label className="block text-xs font-bold text-gris-claro uppercase tracking-wider mb-2">Precio Base</label>
             <div className="relative">
@@ -97,6 +93,7 @@ export default function Productos() {
               />
             </div>
           </div>
+
           <div className="md:col-span-1">
             <label className="block text-xs font-bold text-gris-claro uppercase tracking-wider mb-2">Unidad</label>
             <select 
@@ -111,7 +108,8 @@ export default function Productos() {
               <option value="km">Kilómetro (km)</option>
             </select>
           </div>
-          <div className="md:col-span-5 flex justify-end mt-2">
+
+          <div className="md:col-span-4 flex justify-end mt-2">
             <button 
               type="submit" 
               disabled={guardando} 
@@ -131,7 +129,7 @@ export default function Productos() {
         {productos.map((p, i) => (
           <div key={i} className="bg-blanco p-6 rounded-xl border border-gray-100 border-l-4 border-l-rojo shadow-sm hover:shadow-md transition-shadow flex justify-between items-center group">
             <div>
-              <p className="text-xs font-mono text-gris-claro mb-1">{p.codigo || 'SIN COD'}</p>
+              {/* Se eliminó la etiqueta <p> que renderizaba el código */}
               <h4 className="font-bold text-negro text-base leading-tight pr-4">{p.nombre}</h4>
             </div>
             <div className="text-right shrink-0">

@@ -113,15 +113,14 @@ const numeroALetras = (numero) => {
     return strMillones + (strMiles ? ' ' + strMiles : '');
   };
 
-  if (numero === 0) return 'CERO';
-  
-  const enteros = Math.floor(numero);
-  const centavos = Math.round((numero - enteros) * 100);
-  
-  const letrasEnteros = Millones(enteros).trim();
-  const letrasCentavos = centavos > 0 ? ` CON ${centavos}/100` : '';
+  // Corrección: Redondear el número al entero más cercano para coincidir con la vista
+  const numeroRedondeado = Math.round(numero);
 
-  return `SON PESOS: ${letrasEnteros}${letrasCentavos}.-`;
+  if (numeroRedondeado === 0) return 'SON PESOS: CERO.-';
+  
+  const letrasEnteros = Millones(numeroRedondeado).trim();
+
+  return `SON PESOS: ${letrasEnteros}.-`;
 };
 
 // ==========================================
@@ -164,7 +163,6 @@ export default function VistaPrevia({ cliente, items, totalNeto, iva, totalFinal
       let marcaAguaImg = null;
       
       try {
-        // Usamos las variables importadas para asegurar compatibilidad con el build de producción
         logoImg = await cargarImagen(logoPdf);
         marcaAguaImg = await cargarImagen(marcaAguaPdf);
       } catch (e) {
@@ -217,7 +215,6 @@ export default function VistaPrevia({ cliente, items, totalNeto, iva, totalFinal
       doc.text(cliente?.empresa || 'Consumidor Final', 130, 73);
 
       // --- MARCA DE AGUA (Fondo) ---
-      // Se posiciona al medio para que no interfiera con el footer final
       if (marcaAguaImg) {
         doc.addImage(marcaAguaImg, 'PNG', 50, 110, 110, 110);
       }
@@ -267,7 +264,6 @@ export default function VistaPrevia({ cliente, items, totalNeto, iva, totalFinal
       doc.text(formatearMoneda(totalFinal), 194, finalY + 18.5, { align: "right" });
 
       // --- CÁLCULO DE POSICIÓN DEL FOOTER ---
-      // Aseguramos que el texto "SON PESOS" siempre aparezca después de la marca de agua (Y=220 aprox)
       const bottomY = Math.max(finalY + 40, 230); 
 
       // Caja gris de "SON PESOS"
@@ -278,7 +274,7 @@ export default function VistaPrevia({ cliente, items, totalNeto, iva, totalFinal
       doc.setFontSize(9);
       doc.setFont("helvetica", "bold");
       
-      // Conversión del monto a texto
+      // Conversión del monto a texto (ahora utilizará el número redondeado)
       const textoLetras = numeroALetras(totalFinal);
       doc.text(textoLetras, 18, bottomY + 8.5);
 
@@ -332,7 +328,6 @@ export default function VistaPrevia({ cliente, items, totalNeto, iva, totalFinal
       </div>
 
       <div className="bg-blanco p-10 rounded-xl shadow-sm border border-gray-100 text-center">
-        {/* Usamos la variable importada para la vista previa en pantalla */}
         <img src={logoPdf} alt="Logo" className="h-24 mx-auto mb-6 object-contain" />
         
         <h2 className="text-3xl font-titulo font-black text-negro mb-2 tracking-wide">
