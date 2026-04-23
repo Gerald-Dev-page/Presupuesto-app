@@ -6,6 +6,12 @@ import autoTable from 'jspdf-autotable';
 import logoPdf from '../assets/logo.png';
 import marcaAguaPdf from '../assets/marca-de-agua.png';
 
+// Importamos los nuevos iconos de contacto
+import iconUbiPdf from '../assets/icon-ubi.png';
+import iconWspPdf from '../assets/icon-wsp.png';
+import iconEmailPdf from '../assets/icon-email.png';
+import iconWebPdf from '../assets/icon-web.png';
+
 // ==========================================
 // MOTOR DE TRADUCCIÓN: NÚMEROS A LETRAS
 // ==========================================
@@ -113,7 +119,6 @@ const numeroALetras = (numero) => {
     return strMillones + (strMiles ? ' ' + strMiles : '');
   };
 
-  // Corrección: Redondear el número al entero más cercano para coincidir con la vista
   const numeroRedondeado = Math.round(numero);
 
   if (numeroRedondeado === 0) return 'SON PESOS: CERO.-';
@@ -161,12 +166,21 @@ export default function VistaPrevia({ cliente, items, totalNeto, iva, totalFinal
       
       let logoImg = null;
       let marcaAguaImg = null;
+      let iconUbiImg = null;
+      let iconWspImg = null;
+      let iconEmailImg = null;
+      let iconWebImg = null;
       
       try {
+        // Carga de todas las imágenes necesarias para el PDF
         logoImg = await cargarImagen(logoPdf);
         marcaAguaImg = await cargarImagen(marcaAguaPdf);
+        iconUbiImg = await cargarImagen(iconUbiPdf);
+        iconWspImg = await cargarImagen(iconWspPdf);
+        iconEmailImg = await cargarImagen(iconEmailPdf);
+        iconWebImg = await cargarImagen(iconWebPdf);
       } catch (e) {
-        console.warn("Error cargando imágenes desde assets", e);
+        console.warn("Alerta: Faltan algunas imágenes en la carpeta assets", e);
       }
 
       // --- CABECERA IZQUIERDA ---
@@ -181,12 +195,33 @@ export default function VistaPrevia({ cliente, items, totalNeto, iva, totalFinal
       doc.setTextColor(colorRojo[0], colorRojo[1], colorRojo[2]);
       doc.text("20375998867", 26, 48);
 
+      // --- INFORMACIÓN DE CONTACTO CON ICONOS ---
       doc.setFontSize(8);
       doc.setFont("helvetica", "normal");
       doc.setTextColor(colorTextoOscuro[0], colorTextoOscuro[1], colorTextoOscuro[2]);
-      doc.text("San Francisco 2031, 5700 San Luis, Argentina", 14, 54);
-      doc.text("2664565098 / 2664162063", 14, 58);
-      doc.text("transportedonroque@outlook.com", 14, 62);
+      
+      let infoY = 54;            // Posición vertical inicial
+      const saltoLinea = 4.5;    // Distancia entre líneas
+      const iconSize = 2.5;      // Tamaño cuadrado del icono (2.5mm)
+
+      // 1. Ubicación
+      if (iconUbiImg) doc.addImage(iconUbiImg, 'PNG', 14, infoY - 2.2, iconSize, iconSize);
+      doc.text("San Francisco 2031, 5700 San Luis, Argentina", 18, infoY);
+      
+      // 2. WhatsApp / Teléfono
+      infoY += saltoLinea;
+      if (iconWspImg) doc.addImage(iconWspImg, 'PNG', 14, infoY - 2.2, iconSize, iconSize);
+      doc.text("2664565098 / 2664162063", 18, infoY);
+
+      // 3. Correo Electrónico
+      infoY += saltoLinea;
+      if (iconEmailImg) doc.addImage(iconEmailImg, 'PNG', 14, infoY - 2.2, iconSize, iconSize);
+      doc.text("Transportedonroque@outlook.com", 18, infoY);
+
+      // 4. Sitio Web
+      infoY += saltoLinea;
+      if (iconWebImg) doc.addImage(iconWebImg, 'PNG', 14, infoY - 2.2, iconSize, iconSize);
+      doc.text("Transportedonroque.ar", 18, infoY);
 
       // --- CABECERA DERECHA ---
       doc.setFontSize(12);
