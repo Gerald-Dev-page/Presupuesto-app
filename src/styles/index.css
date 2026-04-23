@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+/* Definimos el tema de Gerald Presupuestos en Tailwind v4 (Optimizados para UX) */
+@theme {
+  /* Rojo corporativo: Sólido y llamativo, pero ligeramente matizado para no lastimar la vista */
+  --color-rojo: #DC2626;
+
+  /* Off-black: Un gris muy profundo (casi carbón). Elimina la fatiga visual del #000000 */
+  --color-negro: #1F2937;
+
+  /* Gris medio-oscuro: Ideal para textos de lectura, ofrece un contraste suave */
+  --color-gris-oscuro: #4B5563;
+
+  /* Gris suave: Perfecto para placeholders, iconos inactivos o textos secundarios */
+  --color-gris-claro: #9CA3AF;
+
+  /* Fondo humo: Un gris muuuuy sutil (casi blanco) que relaja el fondo de la pantalla */
+  --color-fondo: #F9FAFB;
+
+  /* Blanco puro: Mantenido para que las tarjetas resalten y generen profundidad */
+  --color-blanco: #ffffff;
+
+  --font-titulo: 'Montserrat', 'Anton', sans-serif;
+  --font-sub: 'Oswald', 'Roboto Condensed', sans-serif;
+  --font-texto: 'Roboto', 'Arial', sans-serif;
+}
+
+body {
+  background-color: var(--color-fondo);
+  font-family: var(--font-texto);
+  color: var(--color-gris-oscuro);
+  
+  /* Truco UX Senior: Mejora el renderizado de las tipografías para que se vean más nítidas y suaves en pantallas de alta resolución */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
